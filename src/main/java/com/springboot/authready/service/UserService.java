@@ -4,6 +4,7 @@ import com.springboot.authready.entity.Role;
 import com.springboot.authready.entity.User;
 import com.springboot.authready.model.LoginModel;
 import com.springboot.authready.model.SignupModel;
+import com.springboot.authready.model.UpdateProfileModel;
 import com.springboot.authready.repository.RoleRepository;
 import com.springboot.authready.repository.UserRepository;
 import com.springboot.authready.utils.JwtUtils;
@@ -16,6 +17,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -103,7 +106,7 @@ public class UserService {
             String content = "<p>Hello,</p>"
                     + "<p>You have requested to reset your password.</p>"
                     + "<p>Click the link below to change your password:</p>"
-                    + "<p><a href=\"" + url + "\">Change my password</a></p>"
+                    + "<p><a href=\"" + url + "\">Change password</a></p>"
                     + "<br>"
                     + "<p>Ignore this email if you do remember your password, "
                     + "or you have not made the request.</p>";
@@ -115,6 +118,17 @@ public class UserService {
             mailSender.send(message);
         } catch (MessagingException e){
             e.printStackTrace();
+        }
+    }
+
+    public void update(UpdateProfileModel model) {
+        if (Objects.nonNull(SecurityContextHolder.getContext().getAuthentication())){
+            User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                        .orElseThrow(() -> new UsernameNotFoundException("Something went wrong."));
+            user.setUsername(model.getUsername());
+            user.setPassword(encoder.encode(model.getPassword()));
+            user.setEmail(model.getEmail());
+            userRepository.save(user);
         }
     }
 }

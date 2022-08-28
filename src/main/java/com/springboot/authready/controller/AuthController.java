@@ -1,10 +1,7 @@
 package com.springboot.authready.controller;
 
 import com.springboot.authready.entity.User;
-import com.springboot.authready.model.EmailModel;
-import com.springboot.authready.model.LoginModel;
-import com.springboot.authready.model.ResetPasswordModel;
-import com.springboot.authready.model.SignupModel;
+import com.springboot.authready.model.*;
 import com.springboot.authready.repository.UserRepository;
 import com.springboot.authready.service.UserService;
 import lombok.AllArgsConstructor;
@@ -63,5 +60,11 @@ public class AuthController {
             userService.updatePassword(user, model.getNewPassword());
         }
         return ResponseEntity.ok("All done.");
+    }
+
+    @PutMapping("/edit-profile")
+    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileModel user){
+        userService.update(user);
+        return ResponseEntity.ok("Profile updated successfully.");
     }
 }
